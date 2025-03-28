@@ -1,0 +1,31 @@
+-- CreateTable
+CREATE TABLE "Team" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "name" TEXT NOT NULL
+);
+
+-- CreateTable
+CREATE TABLE "Player" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "name" TEXT NOT NULL,
+    "jersey" INTEGER NOT NULL,
+    "uniqueId" TEXT NOT NULL,
+    "teamId" INTEGER NOT NULL,
+    CONSTRAINT "Player_teamId_fkey" FOREIGN KEY ("teamId") REFERENCES "Team" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
+-- CreateTable
+CREATE TABLE "Match" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "teamAId" INTEGER NOT NULL,
+    "teamBId" INTEGER NOT NULL,
+    "teamAScore" INTEGER NOT NULL DEFAULT 0,
+    "teamBScore" INTEGER NOT NULL DEFAULT 0,
+    "status" TEXT NOT NULL,
+    "startTime" DATETIME NOT NULL,
+    CONSTRAINT "Match_teamAId_fkey" FOREIGN KEY ("teamAId") REFERENCES "Team" ("id") ON DELETE RESTRICT ON UPDATE CASCADE,
+    CONSTRAINT "Match_teamBId_fkey" FOREIGN KEY ("teamBId") REFERENCES "Team" ("id") ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Player_uniqueId_key" ON "Player"("uniqueId");
