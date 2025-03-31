@@ -1,5 +1,6 @@
 'use client'
 
+import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import AdminSidebar from './AdminSidebar'
@@ -21,8 +22,18 @@ export default function Header() {
     return (
         <header className="bg-white border-b shadow-sm">
             <div className="flex items-center justify-between p-4 max-w-5xl mx-auto">
-                <AdminSidebar />
-                <h1 className="text-xl font-bold text-center flex-1">Turniej 2024</h1>
+                <div className="flex justify-center">
+                    <Link href="/">
+                        <Image
+                            src="/aserto_cup.png" // lub np. /logo.svg
+                            alt="Logo Turnieju"
+                            width={200}
+                            height={0}
+                            className="hover:opacity-90 transition"
+                            priority
+                        />
+                    </Link>
+                </div>
                 <div>
                     {isAdmin ? (
                         <button

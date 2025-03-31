@@ -1,12 +1,24 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: [
-    './app/**/*.{js,ts,jsx,tsx}',        // <- App Router
-    './components/**/*.{js,ts,jsx,tsx}', // <- Komponenty
-    './lib/**/*.{js,ts,jsx,tsx}',        // <- np. utils, client Prisma
-  ],
+  content: ['./app/**/*.{ts,tsx}', './components/**/*.{ts,tsx}'],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        primary: '#e53935',
+        background: '#f9f9f9',
+        card: '#ffffff',
+      },
+      borderRadius: {
+        xl: '1rem',
+        '2xl': '1.5rem',
+      },
+      fontFamily: {
+        sans: ['Inter', 'sans-serif'],
+      },
+      boxShadow: {
+        soft: '0 4px 20px rgba(0,0,0,0.05)',
+      },
+    },
   },
   plugins: [],
 }

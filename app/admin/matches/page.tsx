@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Card from "@/app/compontents/ui/Card";
 
 export default function MatchesPage() {
     const [matches, setMatches] = useState([])
@@ -91,8 +92,12 @@ export default function MatchesPage() {
         fetchMatches()
     }
 
+    const groupedMatches: Record<string, MatchWithTeams[]> = {}
+
+
     return (
         <div className="p-6 max-w-3xl mx-auto">
+            <Card>
             <h1 className="text-2xl font-bold mb-4">Mecze</h1>
 
             <div className="space-y-2 mb-6">
@@ -133,7 +138,7 @@ export default function MatchesPage() {
 
                 <button
                     onClick={handleAddMatch}
-                    className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                    className="bg-primary text-white px-4 py-2 rounded-xl hover:bg-red-600 transition"
                 >
                     Dodaj mecz
                 </button>
@@ -210,6 +215,7 @@ export default function MatchesPage() {
                     </li>
                 ))}
             </ul>
+            </Card>
         </div>
     )
 }

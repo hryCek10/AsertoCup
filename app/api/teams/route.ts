@@ -18,6 +18,7 @@ export async function POST(req: Request) {
         data: {
             name: body.name,
             group: body.group,
+            logo: body.logo || null,
         },
     })
 
@@ -45,6 +46,7 @@ export async function PUT(req: Request) {
         data: {
             name: body.name,
             group: body.group,
+            logo: body.logo || null,
         },
     })
 

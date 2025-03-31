@@ -1,6 +1,7 @@
 'use client'
 
 import {use, useEffect, useState} from 'react'
+import Card from "@/app/compontents/ui/Card";
 
 export default function PlayersPage(){
     const [players, setPlayers] = useState([])
@@ -89,7 +90,7 @@ export default function PlayersPage(){
 
     return (<div className="p-6 max-w-2xl mx-auto">
         <h1 className="text-2xl font-bold mb-4">Zawodnicy</h1>
-
+        <Card>
         <div className="mb-6 space-y-2">
             <input
                 type="text"
@@ -195,6 +196,7 @@ export default function PlayersPage(){
                     </li>
                 ))}
             </ul>
+        </Card>
     </div>
 )
 }

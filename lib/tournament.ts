@@ -15,6 +15,7 @@ type Team = {
 type TableRow = {
     teamId: number
     teamName: string
+    logo?: string
     points: number
     goalsFor: number
     goalsAgainst: number
@@ -32,6 +33,7 @@ export function calculateGroupTables(teams: Team[], matches: Match[]): Record<st
         table[team.group][team.id] = {
             teamId: team.id,
             teamName: team.name,
+            logo: team.logo,
             points: 0,
             goalsFor: 0,
             goalsAgainst: 0,

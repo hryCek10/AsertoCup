@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { calculateGroupTables } from '@/lib/tournament'
+import Card from "@/app/compontents/ui/Card";
 
 export default function GroupsPage() {
     const [teams, setTeams] = useState([])
@@ -25,6 +26,7 @@ export default function GroupsPage() {
 
     return (
         <div className="p-6 max-w-4xl mx-auto">
+            <Card>
             <h1 className="text-2xl font-bold mb-6">Tabela Grupowa</h1>
 
             {Object.keys(tables).sort().map(group => (
@@ -54,6 +56,7 @@ export default function GroupsPage() {
                     </table>
                 </div>
             ))}
+            </Card>
         </div>
     )
 }

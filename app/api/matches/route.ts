@@ -4,13 +4,29 @@ import { NextResponse } from 'next/server'
 export async function GET() {
     const matches = await prisma.match.findMany({
         include: {
-            teamA: true,
-            teamB: true,
+            teamA: {
+                select: {
+                    id: true,
+                    name: true,
+                    logo: true,
+                    group: true,
+                },
+            },
+            teamB: {
+                select: {
+                    id: true,
+                    name: true,
+                    logo: true,
+                    group: true,
+                },
+            },
         },
         orderBy: { startTime: 'asc' },
     })
+
     return NextResponse.json(matches)
 }
+
 
 export async function POST(req: Request) {
     const body = await req.json()

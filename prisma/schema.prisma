@@ -8,21 +8,22 @@ generator client {
 }
 
 model Team {
-  id        Int      @id @default(autoincrement())
-  name      String
-  group     String?  // np. "A", "B", "C", "D"
-  players   Player[]
-  matchesAsTeamA Match[] @relation("TeamA")
-  matchesAsTeamB Match[] @relation("TeamB")
+  id             Int      @id @default(autoincrement())
+  name           String
+  group          String?
+  logo           String? // ← Nowe pole na URL/logo
+  players        Player[]
+  matchesAsTeamA Match[]  @relation("TeamA")
+  matchesAsTeamB Match[]  @relation("TeamB")
 }
 
 model Player {
-  id        Int    @id @default(autoincrement())
-  name      String
-  jersey    Int
-  uniqueId  String @unique
-  teamId    Int
-  team      Team   @relation(fields: [teamId], references: [id])
+  id       Int    @id @default(autoincrement())
+  name     String
+  jersey   Int
+  uniqueId String @unique
+  teamId   Int
+  team     Team   @relation(fields: [teamId], references: [id])
 
   @@unique([teamId, jersey])
 }
@@ -33,9 +34,9 @@ model Match {
   teamBId    Int
   teamAScore Int      @default(0)
   teamBScore Int      @default(0)
-  status     String   // scheduled, in_progress, finished
+  status     String // scheduled, in_progress, finished
   startTime  DateTime
 
-  teamA      Team     @relation("TeamA", fields: [teamAId], references: [id])
-  teamB      Team     @relation("TeamB", fields: [teamBId], references: [id])
+  teamA Team @relation("TeamA", fields: [teamAId], references: [id])
+  teamB Team @relation("TeamB", fields: [teamBId], references: [id])
 }
