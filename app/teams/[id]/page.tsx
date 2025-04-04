@@ -5,13 +5,10 @@ import { notFound } from 'next/navigation'
 import { Shield } from 'lucide-react'
 import {calculateGroupTables} from "@/lib/tournament";
 
-type Props = {
-    params: { id: string }
-}
 
-export default async function TeamDetails({ params: {id} }: Props) {
+export default async function TeamDetails({ params }: { params: { id: string } }) {
     const team = await prisma.team.findUnique({
-        where: { id: Number(id) },
+        where: { id: Number(params.id) },
         include: { players: true },
     })
 
