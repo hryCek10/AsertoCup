@@ -2,18 +2,37 @@
 
 import { useEffect, useState } from 'react'
 import Card from "@/app/compontents/ui/Card";
+import Modal from "@/app/compontents/ui/Modal";
+import MatchCard from "@/app/compontents/ui/MatchCard";
 
 export default function MatchesPage() {
-    const [matches, setMatches] = useState([])
+
+    type MatchWithTeams = {
+        id: number
+        startTime: string
+        teamAScore: number
+        teamBScore: number
+        teamA: {
+            name: string
+            logo?: string
+            group?: string
+        }
+        teamB: {
+            name: string
+            logo?: string
+            group?: string
+        }
+        status: string
+    }
+
+    const [matches, setMatches] = useState<MatchWithTeams[]>([])
     const [teams, setTeams] = useState([])
     const [teamAId, setTeamAId] = useState('')
     const [teamBId, setTeamBId] = useState('')
 
 
-    const [editingId, setEditingId] = useState<number | null>(null)
-    const [teamAScore, setTeamAScore] = useState('')
-    const [teamBScore, setTeamBScore] = useState('')
-    const [status, setStatus] = useState('')
+
+    const [isModalOpen, setIsModalOpen] = useState(false)
 
     const getTodayAtNoon = () => {
         const now = new Date()
@@ -61,160 +80,237 @@ export default function MatchesPage() {
         setStartTime(getTodayAtNoon)
     }
 
-    const startEdit = (match: any) => {
-        setEditingId(match.id)
-        setTeamAScore(String(match.teamAScore))
-        setTeamBScore(String(match.teamBScore))
-        setStatus(match.status)
-    }
-
-    const saveEdit = async () => {
-        await fetch('/api/matches', {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                id: editingId,
-                teamAScore: parseInt(teamAScore),
-                teamBScore: parseInt(teamBScore),
-                status,
-            }),
-        })
-        setEditingId(null)
-        fetchMatches()
-    }
-
-    const deleteMatch = async (id: number) => {
+    const handleDeleteMatch = async (id: number) => {
+        if (!confirm('Na pewno usunąć mecz?')) return
         await fetch('/api/matches', {
             method: 'DELETE',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ id }),
         })
-        fetchMatches()
+        await fetchMatches() // odśwież listę
     }
 
-    const groupedMatches: Record<string, MatchWithTeams[]> = {}
+    const [editingMatch, setEditingMatch] = useState()
+    const [editTeamAId, setEditTeamAId] = useState()
+    const [editTeamBId, setEditTeamBId] = useState()
+    const [editStartTime, setEditStartTime] = useState()
+    const [editTeamAScore, setEditTeamAScore] = useState()
+    const [editTeamBScore, setEditTeamBScore] = useState()
+    const [editStatus, setEditStatus] = useState<'scheduled' | 'in_progress' | 'finished'>('scheduled')
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false)
 
+    const handleEditMatch = (match: any) => {
+        setEditingMatch(match)
+        setEditTeamAId(match.teamA.id)
+        setEditTeamBId(match.teamB.id)
+        setEditStartTime(match.startTime.slice(0, 16)) // do inputa datetime-local
+        setEditTeamAScore(match.teamAScore ?? '')
+        setEditTeamBScore(match.teamBScore ?? '')
+        setEditStatus(match.status)
+        setIsEditModalOpen(true)
+    }
+
+    const handleSaveEditedMatch = async () => {
+        if(!editingMatch) return
+        await fetch('/api/matches', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                id: editingMatch.id,
+                teamAId: Number(editTeamAId),
+                teamBId: Number(editTeamBId),
+                startTime: editStartTime,
+                teamAScore: editTeamAScore === '' ? null : Number(editTeamAScore),
+                teamBScore: editTeamBScore === '' ? null : Number(editTeamBScore),
+                status: editStatus,
+            }),
+        })
+
+        setIsEditModalOpen(false)
+        setEditingMatch(null)
+        await fetchMatches() // odśwież dane
+    }
+
+    const groupedMatches: Record<string, any[]> = {}
+
+    matches.forEach((match) => {
+        const group = match.teamA?.group || match.teamB?.group || 'Brak grupy'
+        if (!groupedMatches[group]) groupedMatches[group] = []
+        groupedMatches[group].push(match)
+    })
 
     return (
         <div className="p-6 max-w-3xl mx-auto">
             <Card>
             <h1 className="text-2xl font-bold mb-4">Mecze</h1>
 
-            <div className="space-y-2 mb-6">
-                <div className="flex gap-2">
-                    <select
-                        value={teamAId}
-                        onChange={e => setTeamAId(e.target.value)}
-                        className="border px-2 py-1 rounded w-full"
+                <div className="mb-6">
+                    <button
+                        onClick={() => setIsModalOpen(true)}
+                        className="w-full bg-primary text-white px-4 py-2 rounded-xl hover:bg-red-600 transition"
                     >
-                        <option value="">Drużyna A</option>
-                        {teams.map((team: any) => (
-                            <option key={team.id} value={team.id}>
-                                {team.name}
-                            </option>
+                        + Dodaj mecz
+                    </button>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {Object.entries(groupedMatches).map(([groupName, matchesInGroup]) => (
+                    <div key={groupName} className="mb-6">
+                        <h2 className="text-lg font-semibold mb-2">Grupa {groupName}</h2>
+                        <ul className="space-y-4">
+                        {matchesInGroup.map((match: any) => (
+                            <MatchCard
+                                key={match.id}
+                                match={match}
+                                onEdit={handleEditMatch}
+                                onDelete={handleDeleteMatch}
+                            />
                         ))}
-                    </select>
-
-                    <select
-                        value={teamBId}
-                        onChange={e => setTeamBId(e.target.value)}
-                        className="border px-2 py-1 rounded w-full"
-                    >
-                        <option value="">Drużyna B</option>
-                        {teams.map((team: any) => (
-                            <option key={team.id} value={team.id}>
-                                {team.name}
-                            </option>
-                        ))}
-                    </select>
+                    </ul>
+                    </div>
+                ))}
                 </div>
 
-                <input
-                    type="datetime-local"
-                    value={startTime}
-                    onChange={e => setStartTime(e.target.value)}
-                    className="border px-2 py-1 rounded w-full"
-                />
+                <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+                    <h2 className="text-lg font-bold mb-4">Dodaj mecz</h2>
 
-                <button
-                    onClick={handleAddMatch}
-                    className="bg-primary text-white px-4 py-2 rounded-xl hover:bg-red-600 transition"
-                >
-                    Dodaj mecz
-                </button>
-            </div>
+                    <div className="flex flex-col gap-2">
+                        <select
+                            value={teamAId}
+                            onChange={(e) => setTeamAId(e.target.value)}
+                            className="border px-2 py-1 rounded w-full"
+                        >
+                            <option value="">Drużyna A</option>
+                            {teams.map((team: any) => (
+                                <option key={team.id} value={team.id}>
+                                    {team.name}
+                                </option>
+                            ))}
+                        </select>
 
-            <ul className="space-y-4">
-                {matches.map((match: any) => (
-                    <li
-                        key={match.id}
-                        className="border p-4 rounded shadow-sm bg-white"
-                    >
-                        <div className="flex justify-between items-center mb-2">
-                            <div className="font-semibold">
-                                {match.teamA.name} vs {match.teamB.name}
-                            </div>
-                            <div className="text-sm text-gray-600">
-                                {new Date(match.startTime).toLocaleString()}
-                            </div>
+                        <select
+                            value={teamBId}
+                            onChange={(e) => setTeamBId(e.target.value)}
+                            className="border px-2 py-1 rounded w-full"
+                        >
+                            <option value="">Drużyna B</option>
+                            {teams.map((team: any) => (
+                                <option key={team.id} value={team.id}>
+                                    {team.name}
+                                </option>
+                            ))}
+                        </select>
+
+                        <input
+                            type="datetime-local"
+                            value={startTime}
+                            onChange={(e) => setStartTime(e.target.value)}
+                            className="border px-2 py-1 rounded w-full"
+                        />
+
+                        <div className="flex justify-end gap-2 mt-4">
+                            <button
+                                onClick={() => setIsModalOpen(false)}
+                                className="bg-gray-200 text-gray-800 px-4 py-2 rounded"
+                            >
+                                Anuluj
+                            </button>
+                            <button
+                                onClick={() => {
+                                    handleAddMatch()
+                                    setIsModalOpen(false)
+                                }}
+                                className="bg-primary text-white px-4 py-2 rounded"
+                            >
+                                Dodaj mecz
+                            </button>
+                        </div>
+                    </div>
+                </Modal>
+
+                <Modal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)}>
+                    <h2 className="text-lg font-bold mb-4">Edytuj mecz</h2>
+
+                    <div className="flex flex-col gap-2">
+                        <select
+                            value={editTeamAId}
+                            onChange={(e) => setEditTeamAId(e.target.value)}
+                            className="border px-2 py-1 rounded w-full"
+                        >
+                            <option value="">Drużyna A</option>
+                            {teams.map((team) => (
+                                <option key={team.id} value={team.id}>
+                                    {team.name}
+                                </option>
+                            ))}
+                        </select>
+
+                        <select
+                            value={editTeamBId}
+                            onChange={(e) => setEditTeamBId(e.target.value)}
+                            className="border px-2 py-1 rounded w-full"
+                        >
+                            <option value="">Drużyna B</option>
+                            {teams.map((team) => (
+                                <option key={team.id} value={team.id}>
+                                    {team.name}
+                                </option>
+                            ))}
+                        </select>
+
+                        <input
+                            type="datetime-local"
+                            value={editStartTime}
+                            onChange={(e) => setEditStartTime(e.target.value)}
+                            className="border px-2 py-1 rounded w-full"
+                        />
+
+                        <div className="flex gap-2">
+                            <input
+                                type="number"
+                                placeholder="Wynik drużyny A"
+                                value={editTeamAScore}
+                                onChange={(e) => setEditTeamAScore(e.target.value)}
+                                className="border px-2 py-1 rounded w-full"
+                            />
+                            <input
+                                type="number"
+                                placeholder="Wynik drużyny B"
+                                value={editTeamBScore}
+                                onChange={(e) => setEditTeamBScore(e.target.value)}
+                                className="border px-2 py-1 rounded w-full"
+                            />
                         </div>
 
-                        {editingId === match.id ? (
-                            <div className="flex flex-col gap-2">
-                                <div className="flex gap-2">
-                                    <input
-                                        type="number"
-                                        value={teamAScore}
-                                        onChange={e => setTeamAScore(e.target.value)}
-                                        className="border p-1 rounded w-full"
-                                        placeholder={`${match.teamA.name} – gole`}
-                                    />
-                                    <input
-                                        type="number"
-                                        value={teamBScore}
-                                        onChange={e => setTeamBScore(e.target.value)}
-                                        className="border p-1 rounded w-full"
-                                        placeholder={`${match.teamB.name} – gole`}
-                                    />
-                                </div>
+                        <select
+                            value={editStatus}
+                            onChange={(e) =>
+                                setEditStatus(e.target.value as 'scheduled' | 'in_progress' | 'finished')
+                            }
+                            className="border px-2 py-1 rounded w-full"
+                        >
+                            <option value="scheduled">Zaplanowany</option>
+                            <option value="in_progress">W trakcie</option>
+                            <option value="finished">Zakończony</option>
+                        </select>
 
-                                <select
-                                    value={status}
-                                    onChange={e => setStatus(e.target.value)}
-                                    className="border p-1 rounded"
-                                >
-                                    <option value="scheduled">Zaplanowany</option>
-                                    <option value="in_progress">W trakcie</option>
-                                    <option value="finished">Zakończony</option>
-                                </select>
+                        <div className="flex justify-end gap-2 mt-4">
+                            <button
+                                onClick={() => setIsEditModalOpen(false)}
+                                className="bg-gray-200 text-gray-800 px-4 py-2 rounded"
+                            >
+                                Anuluj
+                            </button>
+                            <button
+                                onClick={handleSaveEditedMatch}
+                                className="bg-primary text-white px-4 py-2 rounded"
+                            >
+                                Zapisz zmiany
+                            </button>
+                        </div>
+                    </div>
+                </Modal>
 
-                                <button
-                                    onClick={saveEdit}
-                                    className="bg-green-600 text-white px-3 py-1 rounded"
-                                >
-                                    Zapisz
-                                </button>
-                            </div>
-                        ) : (
-                            <div className="flex justify-between items-center">
-                <span>
-                  Wynik: {match.teamAScore} : {match.teamBScore}
-                </span>
-                                <span className="text-sm text-gray-500 capitalize">{match.status}</span>
-                                <div className="flex gap-4 text-sm text-blue-600">
-                                    <button onClick={() => startEdit(match)}>Edytuj</button>
-                                    <button
-                                        onClick={() => deleteMatch(match.id)}
-                                        className="text-red-600"
-                                    >
-                                        Usuń
-                                    </button>
-                                </div>
-                            </div>
-                        )}
-                    </li>
-                ))}
-            </ul>
+
             </Card>
         </div>
     )

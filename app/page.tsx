@@ -35,6 +35,7 @@ export default function PublicPage() {
       <div className="p-4 max-w-6xl mx-auto">
 
         {/* 🔴 Mecze w trakcie */}
+          <h1 className="text-xl font-semibold mb-4">Mecze w Trakcie</h1>
           <div className="flex overflow-x-auto gap-4 pb-4">
               {liveMatches.map((match: any) => (
                   <div

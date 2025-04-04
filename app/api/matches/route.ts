@@ -48,22 +48,26 @@ export async function POST(req: Request) {
 }
 
 export async function PUT(req: Request) {
-    const body = await req.json()
+    const data = await req.json()
 
-    if (!body.id) {
-        return NextResponse.json({ error: 'Missing match ID' }, { status: 400 })
+    try {
+        const updated = await prisma.match.update({
+            where: { id: data.id },
+            data: {
+                teamAId: data.teamAId,
+                teamBId: data.teamBId,
+                startTime: new Date(data.startTime),
+                teamAScore: data.teamAScore,
+                teamBScore: data.teamBScore,
+                status: data.status,
+            },
+        })
+
+        return NextResponse.json(updated)
+    } catch (error) {
+        console.error('Błąd PUT /api/matches:', error)
+        return NextResponse.json({ error: 'Coś poszło nie tak' }, { status: 500 })
     }
-
-    const match = await prisma.match.update({
-        where: { id: body.id },
-        data: {
-            teamAScore: Number(body.teamAScore),
-            teamBScore: Number(body.teamBScore),
-            status: body.status,
-        },
-    })
-
-    return NextResponse.json(match)
 }
 
 export async function DELETE(req: Request) {
@@ -82,4 +86,26 @@ export async function DELETE(req: Request) {
     } catch (error) {
         return NextResponse.json({ error: 'Nie udało się usunąć meczu' }, { status: 500 })
     }
+}
+
+export async function PATCH(
+    req: Request,
+    { params }: { params: { id: string } }
+) {
+    const matchId = Number(params.id)
+    const data = await req.json()
+
+    const updatedMatch = await prisma.match.update({
+        where: { id: matchId },
+        data: {
+            teamAId: data.teamAId,
+            teamBId: data.teamBId,
+            startTime: new Date(data.startTime),
+            teamAScore: data.teamAScore,
+            teamBScore: data.teamBScore,
+            status: data.status,
+        },
+    })
+
+    return NextResponse.json(updatedMatch)
 }
