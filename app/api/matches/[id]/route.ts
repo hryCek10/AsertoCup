@@ -1,13 +1,11 @@
-// app/api/matches/[id]/route.ts
-
+import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import { NextResponse } from 'next/server'
 
 export async function PATCH(
-    req: Request,
-    context: { params: { id: string } }
+    req: NextRequest,
+    { params }: { params: { id: string } }
 ) {
-    const matchId = Number(context.params.id)
+    const matchId = Number(params.id)
     const data = await req.json()
 
     const updatedMatch = await prisma.match.update({
