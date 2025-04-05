@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import Card from "@/app/compontents/ui/Card";
 import Modal from "@/app/compontents/ui/Modal";
 import MatchCard from "@/app/compontents/ui/MatchCard";
+import {Match, Team} from "@prisma/client";
 
 export default function MatchesPage() {
 
@@ -90,7 +91,10 @@ export default function MatchesPage() {
         await fetchMatches() // odśwież listę
     }
 
-    const [editingMatch, setEditingMatch] = useState()
+    const [editingMatch, setEditingMatch] = useState<Match & {
+        teamA: Team
+        teamB: Team
+    } | null>(null)
     const [editTeamAId, setEditTeamAId] = useState()
     const [editTeamBId, setEditTeamBId] = useState()
     const [editStartTime, setEditStartTime] = useState()
