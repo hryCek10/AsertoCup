@@ -6,7 +6,11 @@ import { Shield } from 'lucide-react'
 import {calculateGroupTables} from "@/lib/tournament";
 
 
-export default async function TeamDetails({ params }: { params: { id: string } }) {
+export default async function TeamDetails({
+                                              params,
+                                          }: {
+    params: { id: string }
+}) {
     const teamId = Number(params.id)
 
     const team = await prisma.team.findUnique({
