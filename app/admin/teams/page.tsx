@@ -3,9 +3,10 @@ import { useEffect, useState } from "react";
 import Card from "@/app/compontents/ui/Card";
 import {Shield} from "lucide-react";
 import Modal from "@/app/compontents/ui/Modal";
+import {Team} from "@prisma/client";
 
 export default function TeamsPage() {
-    const [teams, setTeams] = useState([])
+    const [teams, setTeams] = useState<Team[]>([])
     const [name, setName] = useState('')
     const [editingId, setEditingId] = useState<number | null>(null)
     const [editedName, setEditedName] = useState('')

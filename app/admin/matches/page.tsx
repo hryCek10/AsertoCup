@@ -27,7 +27,7 @@ export default function MatchesPage() {
     }
 
     const [matches, setMatches] = useState<MatchWithTeams[]>([])
-    const [teams, setTeams] = useState([])
+    const [teams, setTeams] = useState<Team[]>([])
     const [teamAId, setTeamAId] = useState('')
     const [teamBId, setTeamBId] = useState('')
 
@@ -143,6 +143,7 @@ export default function MatchesPage() {
         groupedMatches[group].push(match)
     })
 
+    // @ts-ignore
     return (
         <div className="p-6 max-w-3xl mx-auto">
             <Card>
