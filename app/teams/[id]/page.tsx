@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma'
 import { notFound } from 'next/navigation'
 import { Shield } from 'lucide-react'
 import {calculateGroupTables} from "@/lib/tournament";
+import {Team} from "@prisma/client";
 
 
 export default async function TeamDetails({
@@ -25,7 +26,7 @@ export default async function TeamDetails({
         prisma.match.findMany(),
     ])
 
-    const groupTables = calculateGroupTables(teams, matches)
+    const groupTables = calculateGroupTables(teams as Team[], matches)
     const teamGroupTable = groupTables[team.group ?? ''] || []
 
 

@@ -9,14 +9,14 @@ type Match = {
 type Team = {
     id: number
     name: string
-    logo: string
+    logo: string | null
     group: string | null
 }
 
 type TableRow = {
     teamId: number
     teamName: string
-    logo?: string
+    logo?: string | null
     points: number
     goalsFor: number
     goalsAgainst: number
