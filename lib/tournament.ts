@@ -9,6 +9,7 @@ type Match = {
 type Team = {
     id: number
     name: string
+    logo: string
     group: string | null
 }
 
