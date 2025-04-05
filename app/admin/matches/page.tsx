@@ -95,11 +95,11 @@ export default function MatchesPage() {
         teamA: Team
         teamB: Team
     } | null>(null)
-    const [editTeamAId, setEditTeamAId] = useState()
-    const [editTeamBId, setEditTeamBId] = useState()
-    const [editStartTime, setEditStartTime] = useState()
-    const [editTeamAScore, setEditTeamAScore] = useState()
-    const [editTeamBScore, setEditTeamBScore] = useState()
+    const [editTeamAId, setEditTeamAId] = useState<string>("")
+    const [editTeamBId, setEditTeamBId] = useState<string>("")
+    const [editStartTime, setEditStartTime] = useState<string>("")
+    const [editTeamAScore, setEditTeamAScore] = useState<string>("")
+    const [editTeamBScore, setEditTeamBScore] = useState<string>("")
     const [editStatus, setEditStatus] = useState<'scheduled' | 'in_progress' | 'finished'>('scheduled')
     const [isEditModalOpen, setIsEditModalOpen] = useState(false)
 
