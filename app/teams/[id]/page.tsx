@@ -7,8 +7,10 @@ import {calculateGroupTables} from "@/lib/tournament";
 
 
 export default async function TeamDetails({ params }: { params: { id: string } }) {
+    const teamId = Number(params.id)
+
     const team = await prisma.team.findUnique({
-        where: { id: Number(params.id) },
+        where: { id: teamId },
         include: { players: true },
     })
 
