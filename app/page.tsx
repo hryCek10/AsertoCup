@@ -6,10 +6,12 @@ import TableWrapper from "@/app/compontents/ui/Table";
 import { Shield } from "lucide-react";
 import TeamWithLogo from "@/app/compontents/TeamWIthLogo";
 import { format } from 'date-fns'
+import Image from 'next/image'
 
 export default function PublicPage() {
     const [teams, setTeams] = useState([]);
     const [matches, setMatches] = useState([]);
+    const [isImageModalOpen, setIsImageModalOpen] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -59,29 +61,66 @@ export default function PublicPage() {
                 ))}
             </div>
 
-            {/* 🗓️ Harmonogram */}
-            <div className="mt-8">
-                <h2 className="text-xl font-semibold mb-4 ">Harmonogram Turnieju</h2>
-                <ul className="space-y-2">
-                    <li className="text-center">9:00 Start Turnieju</li>
-                    <li className="text-center">15:45 Zakończenie rozgrywek grupowych</li>
-                    <li className="text-center">17:30 Finał</li>
-                    <li className="text-center">18:00 Rozdanie nagród i zakończenie turnieju</li>
-                </ul>
+            {/* 🗓️ Harmonogram i Mecze - 50/50 */}
+            <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+                {/* Harmonogram */}
+                <div>
+                    <h2 className="text-xl font-semibold mb-4">Harmonogram Turnieju</h2>
+                    <div
+                        className="relative w-full max-w-xs cursor-pointer hover:opacity-90 transition-opacity"
+                        onClick={() => setIsImageModalOpen(true)}
+                    >
+                        <Image
+                            src="/pics/harmonogram.jpg"
+                            alt="Harmonogram turnieju"
+                            width={200}
+                            height={150}
+                            className="rounded-2xl shadow-soft w-full h-auto"
+                        />
+                        <div className="absolute bottom-2 right-2 bg-black/50 text-white text-xs px-2 py-1 rounded">
+                            Kliknij, aby powiększyć
+                        </div>
+                    </div>
+                </div>
+
+                {/* Mecze */}
+                <div>
+                    <h2 className="text-xl font-semibold mb-4">Mecze:</h2>
+                    <ul className="space-y-2">
+                        {sortedMatches.map((match: any) => (
+                            <li key={match.id} className="text-sm">
+                                <span className="font-medium">
+                                    {format(new Date(match.startTime), 'HH:mm')} - {match.teamA.name} vs {match.teamB.name} - {match.teamAScore} : {match.teamBScore}
+                                </span>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
             </div>
 
-            <div className="mt-8">
-                <h2 className="text-xl font-semibold mb-4 ">Mecze:</h2>
-                <ul className="space-y-2">
-                    {sortedMatches.map((match: any) => (
-                        <li key={match.id} className="text-sm">
-              <span className="font-medium">
-                {format(new Date(match.startTime), 'HH:mm')} - {match.teamA.name} vs {match.teamB.name} - {match.teamAScore} : {match.teamBScore}
-              </span>
-                        </li>
-                    ))}
-                </ul>
-            </div>
+            {/* Modal z powiększonym obrazkiem */}
+            {isImageModalOpen && (
+                <div
+                    className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4"
+                    onClick={() => setIsImageModalOpen(false)}
+                >
+                    <div className="relative max-w-6xl max-h-[90vh] w-full">
+                        <button
+                            className="absolute -top-10 right-0 text-white text-2xl hover:text-gray-300"
+                            onClick={() => setIsImageModalOpen(false)}
+                        >
+                            ✕
+                        </button>
+                        <Image
+                            src="/pics/harmonogram.jpg"
+                            alt="Harmonogram turnieju"
+                            width={1920}
+                            height={1080}
+                            className="rounded-lg w-full h-auto max-h-[90vh] object-contain"
+                        />
+                    </div>
+                </div>
+            )}
 
             {/* 📊 Tabele grupowe */}
             <div className="mt-8">

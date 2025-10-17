@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Home, Users } from 'lucide-react'
+import { Home, Users, PlusCircle } from 'lucide-react'
 
 const links = [
     { href: '/', label: 'Strona główna', icon: Home },
@@ -21,7 +21,7 @@ export default function PublicSidebar() {
           Turniej
         </span>
             </div>
-            <nav className="flex flex-col gap-2 px-2">
+            <nav className="flex flex-col gap-2 px-2 flex-1">
                 {links.map(({ href, label, icon: Icon }) => {
                     const active = pathname === href
                     return (
@@ -42,6 +42,19 @@ export default function PublicSidebar() {
                     )
                 })}
             </nav>
+
+            {/* Przycisk zgłoś zespół na dole */}
+            <div className="px-2 pb-4">
+                <Link
+                    href="/teams/register"
+                    className="flex items-center gap-3 px-3 py-2 rounded-xl transition-all duration-200 bg-red-600 text-white hover:bg-red-700"
+                >
+                    <PlusCircle size={20} className="min-w-[20px]" />
+                    <span className="opacity-0 scale-0 group-hover:opacity-100 group-hover:scale-100 transition origin-left duration-200">
+                        Zgłoś zespół
+                    </span>
+                </Link>
+            </div>
         </aside>
     )
 }
