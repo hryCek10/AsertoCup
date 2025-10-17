@@ -24,6 +24,8 @@ type TableRow = {
     group: string
 }
 
+
+
 export function calculateGroupTables(teams: Team[], matches: Match[]): Record<string, TableRow[]> {
     const table: Record<string, Record<number, TableRow>> = {}
 
